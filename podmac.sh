@@ -1,11 +1,11 @@
-#!/bin/bash
+#! usr/bin/env bash
 # configure podman to run x86_64 containers on ARM Mac
 # Laurent Martin IBM 2022
 # tested on macOS 12.6 with Apple M1 Max
 # https://developer.ibm.com/tutorials/running-x86-64-containers-mac-silicon-m1/
 
 # VM parameters: assign default values
-: ${NAME:=intel_64}
+: ${NAME:=podman-machine-intel_x64}
 : ${CPUS:=4}
 : ${RAM_MB:=4096}
 : ${DISK_GB:=40}
@@ -18,14 +18,14 @@ mylog(){
   w=
   s=
   case $1 in
-  info) c=2;;
-  error) c=1;p='ERROR: ';;
-  warn) c=3;;
-  wait) c=4;p="$(date) ";;
-  check) c=6;w=-n;s=...;;
-  ok) c=2;p=OK;;
-  no) c=3;p=NO;;
-  *) c=9;;
+    info) c=2;;
+    error) c=1;p='ERROR: ';;
+    warn) c=3;;
+    wait) c=4;p="$(date) ";;
+    check) c=6;w=-n;s=...;;
+    ok) c=2;p=OK;;
+    no) c=3;p=NO;;
+    *) c=9;;
   esac
   shift
   echo -e $w "$(tput setaf $c)$p$@$s$(tput op)"
@@ -36,7 +36,7 @@ get_parameter(){
   if test -z "$config";then
     config="$(podman machine inspect $NAME)"
   fi
-  echo "$config"|jq -r ".[0].$1"
+  echo "$config" | jq -r ".[0].$1"
 }
 
 # Create machine
@@ -45,11 +45,11 @@ create_machine(){
   if podman machine inspect $NAME 2> /dev/null 1>&2;then
     mylog warn "Machine already exists: $NAME" 1>&2
     users_home="$HOME"
-    config_file=$(podman machine inspect $NAME|jq -r '.[0].ConfigPath.Path')
+    config_file=$(podman machine inspect $NAME | jq -r '.[0].ConfigPath.Path')
     return
   fi
   # latest stable coreos
-  latest_coreos_url=$(curl -s https://builds.coreos.fedoraproject.org/streams/stable.json|jq -r '.architectures.x86_64.artifacts.qemu.formats."qcow2.xz".disk.location')
+  latest_coreos_url=$(curl -s 'https://builds.coreos.fedoraproject.org/streams/stable.json' | jq -r '.architectures.x86_64.artifacts.qemu.formats."qcow2.xz".disk.location')
 
   # the current user HOME folder is forwarded in VM so that persistent storage can be specified in containers and podman volume mounts also works on host
   users_home="$HOME"
@@ -74,7 +74,7 @@ create_machine(){
   # alter qemu configuration to set type as x86 and remove unsupported parameters
   # changed '-cpu host' to '-cpu max' to resolve 'Fatal glibc error: CPU does not support x86-64-v2' for RHEL 9 images
   mylog info "Fixing machine $NAME parameters"
-  config_file=$(podman machine inspect $NAME|jq -r '.[0].ConfigPath.Path')
+  config_file=$(podman machine inspect $NAME | jq -r '.[0].ConfigPath.Path')
   sed \
     -i ''                  `#modify in place`\
     -E                     `#extended syntax`\
