@@ -1,4 +1,4 @@
-#! usr/bin/env bash
+#! /usr/bin/env bash
 # configure podman to run x86_64 containers on ARM Mac
 # Laurent Martin IBM 2022
 # tested on macOS 12.6 with Apple M1 Max
