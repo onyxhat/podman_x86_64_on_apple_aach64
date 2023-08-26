@@ -5,7 +5,7 @@
 # https://developer.ibm.com/tutorials/running-x86-64-containers-mac-silicon-m1/
 
 # VM parameters: assign default values
-: ${NAME:=podman-machine-intel_x64}
+: ${NAME:=x86_64}
 : ${CPUS:=4}
 : ${RAM_MB:=4096}
 : ${DISK_GB:=40}
