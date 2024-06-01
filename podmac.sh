@@ -5,10 +5,10 @@
 # https://developer.ibm.com/tutorials/running-x86-64-containers-mac-silicon-m1/
 
 # VM parameters: assign default values
-: ${NAME:=x86_64}
-: ${CPUS:=4}
-: ${RAM_MB:=4096}
-: ${DISK_GB:=40}
+: ${NAME:=intel64}
+: ${CPUS:=8}
+: ${RAM_MB:=8192}
+: ${DISK_GB:=80}
 
 # simple logging with colors
 # @param 1 level (info/error/warn/wait/check/ok/no)
@@ -65,7 +65,7 @@ create_machine(){
     --memory=$RAM_MB \
     --disk-size=$DISK_GB \
     --volume="$users_home:$users_home:rw,security_model=none" \
-    --image-path=$latest_coreos_url \
+    --image=$latest_coreos_url \
     $NAME
 
   mylog info "Setting machine $NAME as default"
